@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Daily Dev Tips ver2 - 2026-02-25</title>
+</head>
+<body>
+  <h1>Daily Dev Tips ver2（2026-02-25）</h1>
+
+  <h2>目次</h2>
+  <ul>
+    <li><a href="#laravel">Laravel（サブトピック2つ以上）</a></li>
+    <li><a href="#vue">Vue2（+Vue3補足）</a></li>
+    <li><a href="#react">React Day</a></li>
+    <li><a href="#build">webpack / Vite / npm / yarn</a></li>
+    <li><a href="#aws">AWS（基礎→実務）</a></li>
+    <li><a href="#python">Python実用活用</a></li>
+  </ul>
+
+  <h2 id="laravel">Laravel（サブトピック2つ）</h2>
+  <details open>
+    <summary>サブトピックA: Eloquent + SQL（N+1対策）</summary>
+    <ol>
+      <li>概要: 一覧APIの遅さは、N+1・列取りすぎ・index不足の複合で起きることが多い。</li>
+      <li>なぜ面白いか: 1回の改善で全ユーザーの体感速度が上がる、費用対効果の高い改善領域。</li>
+      <li>現場での使いどころ: <code>with()</code> + <code>select()</code> + EXPLAIN確認をセット運用する。</li>
+      <li>ハマりどころ: eager loadingしても、関連テーブルにindexがなく結局遅い。</li>
+      <li>ミニ課題: 既存API1本で「クエリ数・応答時間・EXPLAIN」をbefore/after比較。</li>
+      <li>公式リンク: <a href="https://laravel.com/docs/11.x/eloquent-relationships#eager-loading" target="_blank" rel="noopener noreferrer">Eloquent eager loading</a></li>
+      <li>公式リンク: <a href="https://laravel.com/docs/11.x/queries" target="_blank" rel="noopener noreferrer">Query Builder</a></li>
+      <li>短いコード例:</li>
+    </ol>
+<pre><code>$users = User::query()
+  ->select(['id','name'])
+  ->with(['profile:id,user_id,avatar'])
+  ->paginate(20);</code></pre>
+  </details>
+
+  <details>
+    <summary>サブトピックB: Validation + FormRequest整理</summary>
+    <ol>
+      <li>概要: バリデーションをControllerから分離し、FormRequestに責務を寄せる。</li>
+      <li>なぜ面白いか: 仕様変更時の修正ポイントが明確になり、レビューが速くなる。</li>
+      <li>現場での使いどころ: LPフォームの入力検証やAPIの入力整形を安定化できる。</li>
+      <li>ハマりどころ: ルールが肥大化して「どの画面の仕様か」不明になる。</li>
+      <li>ミニ課題: 既存エンドポイント1つをFormRequest化し、テストを1本追加する。</li>
+      <li>公式リンク: <a href="https://laravel.com/docs/11.x/validation" target="_blank" rel="noopener noreferrer">Validation</a></li>
+      <li>公式リンク: <a href="https://laravel.com/docs/11.x/controllers" target="_blank" rel="noopener noreferrer">Controllers</a></li>
+    </ol>
+  </details>
+
+  <h2 id="vue">Vue2（+Vue3補足）</h2>
+  <details>
+    <summary>$parent / $children依存を減らして ref + emit へ</summary>
+    <ol>
+      <li>概要: 子は入力UI、親は状態/バリデーションAPIという責務分離を守る。</li>
+      <li>なぜ面白いか: コンポーネントの独立性が上がり、差し替えやテストがしやすい。</li>
+      <li>現場での使いどころ: LPフォームで入力部品（input/radio/select）を共通化しやすい。</li>
+      <li>ハマりどころ: <code>$children[0]</code> の順序依存で将来壊れる。</li>
+      <li>ミニ課題: 1画面で <code>$parent</code> 呼び出しを3箇所 <code>$emit</code> に置換。</li>
+      <li>公式リンク: <a href="https://v2.vuejs.org/v2/guide/components-custom-events.html" target="_blank" rel="noopener noreferrer">Vue2 custom events</a></li>
+      <li>Vue3補足: 同じ設計を emits 定義 + Composition APIでより明示化できる。</li>
+    </ol>
+  </details>
+
+  <h2 id="react">React Day</h2>
+  <details>
+    <summary>Day 3: stateを最小範囲に閉じる</summary>
+    <ol>
+      <li>概要: stateは必要な最小の親に置く。広げすぎると再レンダリング増加。</li>
+      <li>なぜ面白いか: パフォーマンスと可読性を同時に改善できる。</li>
+      <li>現場での使いどころ: フォームやモーダルの局所状態管理で特に効く。</li>
+      <li>ハマりどころ: 派生値までstate化して、不要なuseEffectが増える。</li>
+      <li>ミニ課題: 1コンポーネント分のstateを下位へ移動して差分確認。</li>
+      <li>公式リンク: <a href="https://react.dev/learn/choosing-the-state-structure" target="_blank" rel="noopener noreferrer">Choosing the State Structure</a></li>
+      <li>公式リンク: <a href="https://react.dev/learn/you-might-not-need-an-effect" target="_blank" rel="noopener noreferrer">You Might Not Need an Effect</a></li>
+    </ol>
+  </details>
+
+  <h2 id="build">webpack / Vite / npm / yarn（dev-fast対策）</h2>
+  <details>
+    <summary>起動遅延を計測→切り分け→改善</summary>
+    <ol>
+      <li>概要: 遅延は依存解決・変換処理・watch I/O・source mapが主因になりやすい。</li>
+      <li>なぜ面白いか: 体感待ち時間の短縮は毎日の開発体験を直接改善する。</li>
+      <li>現場での使いどころ: 大規模フロントで dev 起動/再ビルドを安定化できる。</li>
+      <li>ハマりどころ: まず設定をいじって、計測がないまま悪化させる。</li>
+      <li>ミニ課題: <code>time yarn dev-fast</code> を3回測定し、改善案を1つだけ適用して再測定。</li>
+      <li>公式リンク: <a href="https://vite.dev/guide/performance.html" target="_blank" rel="noopener noreferrer">Vite performance</a></li>
+      <li>公式リンク: <a href="https://webpack.js.org/guides/build-performance/" target="_blank" rel="noopener noreferrer">Webpack build performance</a></li>
+    </ol>
+  </details>
+
+  <h2 id="aws">AWS（基礎→実務）</h2>
+  <details>
+    <summary>IAM最小権限と監視の最低ライン</summary>
+    <ol>
+      <li>概要: まずIAM最小権限、次にCloudWatchで異常検知の基礎を固める。</li>
+      <li>なぜ面白いか: セキュリティと運用保守の事故率を下げられる。</li>
+      <li>現場での使いどころ: API運用で5xx/Latency/CPUの3点監視を最小セットにする。</li>
+      <li>ハマりどころ: 初期をAdmin権限で始めて、後から戻せなくなる。</li>
+      <li>ミニ課題: 1ロールを最小権限に見直し、影響確認手順を記録。</li>
+      <li>公式リンク: <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html" target="_blank" rel="noopener noreferrer">IAM best practices</a></li>
+      <li>公式リンク: <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html" target="_blank" rel="noopener noreferrer">CloudWatch</a></li>
+    </ol>
+  </details>
+
+  <h2 id="python">Python実用活用</h2>
+  <details>
+    <summary>CSV→JSON変換の業務自動化</summary>
+    <ol>
+      <li>概要: 定型データ変換をPythonで自動化し、手作業の転記をなくす。</li>
+      <li>なぜ面白いか: 小さい自動化が積み重なると工数削減が大きくなる。</li>
+      <li>現場での使いどころ: マーケデータやフォーム出力の前処理に直結する。</li>
+      <li>ハマりどころ: 文字コード（UTF-8/Shift_JIS）で失敗しやすい。</li>
+      <li>ミニ課題: 1つのCSVをJSON化し、件数一致チェックを追加。</li>
+      <li>公式リンク: <a href="https://docs.python.org/3/library/csv.html" target="_blank" rel="noopener noreferrer">csv module</a></li>
+      <li>公式リンク: <a href="https://docs.python.org/3/library/json.html" target="_blank" rel="noopener noreferrer">json module</a></li>
+    </ol>
+  </details>
+
+</body>
+</html>

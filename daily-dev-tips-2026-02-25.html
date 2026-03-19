@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Daily Dev Tips - 2026-02-25</title>
+  <style>
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans JP",sans-serif;max-width:980px;margin:24px auto;padding:0 16px;line-height:1.65;background:#0b1020;color:#e8ecf3}
+    a{color:#8ec5ff} code,pre{background:#10172a;border:1px solid #2a3554;border-radius:8px} code{padding:2px 6px}
+    pre{padding:10px;overflow:auto}
+    details{background:#121a2e;border:1px solid #2a3554;border-radius:10px;padding:10px 12px;margin:10px 0}
+    summary{cursor:pointer;font-weight:700}
+    .muted{opacity:.85}
+    .ask{margin-top:10px;padding:10px;border:1px dashed #39518a;border-radius:8px}
+    button{padding:6px 10px;border-radius:8px;border:1px solid #4461a8;background:#1b2950;color:#eaf1ff}
+  </style>
+  <script>
+    function copyText(id){
+      const t=document.getElementById(id)?.innerText||"";
+      if(navigator.clipboard) navigator.clipboard.writeText(t);
+    }
+    function openSmart(appUrl, webUrl){
+      const mobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if(!mobile){ window.open(webUrl,'_blank','noopener,noreferrer'); return; }
+      setTimeout(()=>{ location.href=webUrl; },700);
+      location.href=appUrl;
+    }
+  </script>
+</head>
+<body>
+  <h1>Daily Dev Tips（濃いめ版）</h1>
+  <p class="muted">2026-02-25 / 目標: 実務で即使える判断力を積む</p>
+
+  <h2>目次</h2>
+  <ul>
+    <li><a href="#laravel" target="_blank" rel="noopener noreferrer">Laravel（Eloquent/SQL）</a></li>
+    <li><a href="#laravel-test" target="_blank" rel="noopener noreferrer">Laravelユニットテスト</a></li>
+    <li><a href="#vue" target="_blank" rel="noopener noreferrer">Vue2（+Vue3補足）</a></li>
+    <li><a href="#build" target="_blank" rel="noopener noreferrer">ビルド最適化（webpack/Vite/npm/yarn）</a></li>
+    <li><a href="#react" target="_blank" rel="noopener noreferrer">React Day</a></li>
+    <li><a href="#aws" target="_blank" rel="noopener noreferrer">AWS</a></li>
+  </ul>
+
+  <h2 id="laravel">Laravel（サブトピック: Eloquent + SQL最適化）</h2>
+  <details open>
+    <summary>N+1対策を「with だけ」で終わらせない</summary>
+    <ul>
+      <li><b>概要:</b> 一覧APIの遅さは、N+1だけでなく不適切なselect列・index不足・不必要なtoArrayで悪化する。</li>
+      <li><b>なぜ面白い:</b> 1クエリ改善で、全ユーザー体験が毎回改善される“倍率の高い改善”。</li>
+      <li><b>現場:</b> <code>with()</code> + <code>select()</code> + EXPLAIN確認をセットで行う。</li>
+      <li><b>ハマりどころ:</b> eager loadingしても関連側にindexがなくて結局遅い。</li>
+      <li><b>ミニ課題:</b> 1本の一覧APIで「クエリ数」「平均応答」「EXPLAIN」をbefore/after比較。</li>
+      <li><b>基礎復習:</b> Eloquentは便利だが、DB設計（index）を超えて速くはならない。</li>
+    </ul>
+<pre><code>$users = User::query()
+  ->select(['id','name','email'])
+  ->with(['profile:id,user_id,avatar'])
+  ->latest()
+  ->paginate(20);</code></pre>
+    <p>Docs: <a href="https://laravel.com/docs/11.x/eloquent-relationships#eager-loading" target="_blank" rel="noopener noreferrer">Eager Loading</a> / <a href="https://laravel.com/docs/11.x/queries" target="_blank" rel="noopener noreferrer">Query Builder</a></p>
+    <div class="ask">
+      <div id="q-laravel">このLaravelクエリのボトルネック候補を3つ挙げ、改善順を提案して。</div>
+      <button onclick="copyText('q-laravel')">質問テンプレをコピー</button>
+      <button onclick="openSmart('chatgpt://','https://chatgpt.com/')">ChatGPTで質問</button>
+      <button onclick="openSmart('gemini://','https://gemini.google.com/app')">Geminiで質問</button>
+    </div>
+  </details>
+
+  <h2 id="laravel-test">Laravelユニットテスト</h2>
+  <details>
+    <summary>サービス層をAAAで固定化</summary>
+    <ul>
+      <li><b>概要:</b> arrange-act-assertを徹底すると、テストの可読性と壊れにくさが上がる。</li>
+      <li><b>現場:</b> 料金計算・在庫引当など“仕様が変わるロジック”から先にテストを書く。</li>
+      <li><b>ハマりどころ:</b> HTTP層まで触って重くなる。ユニットは依存をモックして切る。</li>
+      <li><b>ミニ課題:</b> 既存サービス1つに正常系/境界値/異常系の3ケース追加。</li>
+    </ul>
+    <p>Docs: <a href="https://laravel.com/docs/11.x/testing" target="_blank" rel="noopener noreferrer">Testing</a></p>
+  </details>
+
+  <h2 id="vue">Vue2（+Vue3補足）</h2>
+  <details>
+    <summary>$parent/$children依存を ref + emit に置換</summary>
+    <ul>
+      <li><b>概要:</b> 子UI（input/radio/select）は値をemit、親が状態とAPIを管理。</li>
+      <li><b>現場:</b> LPフォームのバリデーションAPIは親コンポーネントで一元化。</li>
+      <li><b>ハマりどころ:</b> <code>$children[0]</code> の順序依存で壊れる。</li>
+      <li><b>ミニ課題:</b> 1画面で <code>$parent</code> 呼び出しを <code>emit</code> へ3箇所置換。</li>
+      <li><b>Vue3補足:</b> 同じ設計をComposition API + emits定義で明確化できる。</li>
+    </ul>
+    <p>Docs: <a href="https://v2.vuejs.org/v2/guide/components-custom-events.html" target="_blank" rel="noopener noreferrer">Vue2 Events</a> / <a href="https://vuejs.org/guide/components/events.html" target="_blank" rel="noopener noreferrer">Vue3 Events</a></p>
+  </details>
+
+  <h2 id="build">ビルド最適化（webpack/Vite/npm/yarn）</h2>
+  <details>
+    <summary>dev-fastが遅い時の切り分け手順</summary>
+    <ul>
+      <li><b>概要:</b> 遅延は「依存解決」「変換（ts/babel）」「watch I/O」「sourcemap」のどれか。</li>
+      <li><b>計測:</b> <code>time yarn dev-fast</code> を3回、キャッシュあり/なしで比較。</li>
+      <li><b>現場:</b> node_modules更新直後に急低下しやすい。lockfile差分とパッケージ増加を追う。</li>
+      <li><b>ハマりどころ:</b> devで不要なプラグイン（lint/typecheck）を同時実行している。</li>
+      <li><b>ミニ課題:</b> sourcemap無効化・watch対象除外・キャッシュ設定を1つずつ試す。</li>
+    </ul>
+    <p>Docs: <a href="https://vite.dev/guide/performance.html" target="_blank" rel="noopener noreferrer">Vite Performance</a> / <a href="https://webpack.js.org/guides/build-performance/" target="_blank" rel="noopener noreferrer">Webpack Build Performance</a></p>
+  </details>
+
+  <h2 id="react">React Day 2</h2>
+  <details>
+    <summary>Stateを持つ場所を最小化</summary>
+    <ul>
+      <li><b>概要:</b> stateは「最も近い共通親」に置く。不要な上位stateは再レンダリング増の原因。</li>
+      <li><b>現場:</b> 入力フォームのstateを画面全体に置かず、フォーム領域へ閉じる。</li>
+      <li><b>ハマりどころ:</b> useEffectで導出値を作ってしまう（計算で済むなら不要）。</li>
+      <li><b>ミニ課題:</b> 1コンポーネント分のstateを下位へ移して再描画差分を確認。</li>
+      <li><b>復習:</b> "You Might Not Need an Effect" を常に思い出す。</li>
+    </ul>
+    <p>Docs: <a href="https://react.dev/learn/choosing-the-state-structure" target="_blank" rel="noopener noreferrer">Choosing State Structure</a></p>
+  </details>
+
+  <h2 id="aws">AWS（開発者向け）</h2>
+  <details>
+    <summary>IAM最小権限 + CloudWatch最低限セット</summary>
+    <ul>
+      <li><b>概要:</b> IAMを先に固め、監視はCPUだけでなく5xx/Latencyも見る。</li>
+      <li><b>現場:</b> LP APIなら ALB 5xx + ターゲットレスポンスタイム + Appログを最小セット化。</li>
+      <li><b>ハマりどころ:</b> とりあえずAdmin権限で始めて戻せなくなる。</li>
+      <li><b>ミニ課題:</b> 1ロールを最小権限に縮小し、影響確認手順を作る。</li>
+    </ul>
+    <p>Docs: <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html" target="_blank" rel="noopener noreferrer">IAM Best Practices</a></p>
+  </details>
+
+  <h2>今日の深掘り候補</h2>
+  <p>「Laravel一覧APIで N+1 + index + pagination を一気に改善する実践手順」</p>
+</body>
+</html>

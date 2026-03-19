@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Dev Tips</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; line-height: 1.7; margin: 24px; color: #1f2937; }
+    h1, h2 { line-height: 1.3; }
+    .meta { color: #4b5563; margin-bottom: 12px; }
+    .toc ul { padding-left: 1.2rem; }
+    details { border: 1px solid #e5e7eb; border-radius: 10px; padding: 10px 14px; margin: 12px 0; background: #fff; }
+    summary { cursor: pointer; font-weight: 700; }
+    code, pre { background: #f3f4f6; border-radius: 6px; }
+    code { padding: 0.15em 0.35em; }
+    pre { padding: 10px; overflow-x: auto; }
+    .ask { margin-top: 10px; padding-top: 8px; border-top: 1px dashed #d1d5db; font-size: 0.95rem; }
+    .ask-links a { margin-right: 8px; }
+    button.copy-btn { border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 8px; padding: 4px 10px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Daily Dev Tips</h1>
+  <p class="meta">日付: 2026-02-24 (UTC)</p>
+
+  <section class="toc">
+    <h2>目次</h2>
+    <ul>
+      <li><a href="#laravel">Laravel（サブトピック: Eloquent基礎 / N+1対策）</a></li>
+      <li><a href="#laravel-test">Laravelユニットテスト</a></li>
+      <li><a href="#vue">Vue（Vue2中心 + Vue3補足）</a></li>
+      <li><a href="#docker">Docker</a></li>
+      <li><a href="#aws">AWS（開発者向け）</a></li>
+      <li><a href="#react">React（Day 1）</a></li>
+      <li><a href="#typescript">TypeScript</a></li>
+      <li><a href="#php-array">PHP関数 / 配列ヘルパー</a></li>
+      <li><a href="#lodash">Lodash</a></li>
+      <li><a href="#html-css">HTML & CSS</a></li>
+      <li><a href="#build-opt">フロントエンドビルド最適化</a></li>
+      <li><a href="#python">Python実用活用</a></li>
+      <li><a href="#zapier-n8n">Zapier + n8n比較</a></li>
+      <li><a href="#openclaw">OpenClaw</a></li>
+    </ul>
+  </section>
+
+  <div id="laravel"></div>
+  <details open>
+    <summary>Laravel（Eloquent基礎 + N+1対策）</summary>
+    <p>概要: 今日は Eloquent のリレーション取得と、N+1 を避ける <code>with()</code> の使い方をセットで確認。</p>
+    <p>なぜ面白いか: 書きやすさとSQL最適化を同時に学べるので、コード品質と性能が一気に上がる。</p>
+    <p>現場での使いどころ: 一覧API（例: 投稿一覧 + 著者情報）で、レスポンス速度を守る時に必須。</p>
+    <p>よくあるハマりどころ: BladeやAPI Resource内で暗黙にリレーションへアクセスし、気づかずクエリが増える。</p>
+    <p>基礎の復習: <code>Model::all()</code> の後に関連へ触ると追加クエリが出る可能性、先に <code>with()</code> を意識。</p>
+    <p>今日の実践ミニ課題（You向け）: <code>Post::with('user')->latest()->take(20)->get()</code> と <code>Post::latest()->take(20)->get()</code> を比較し、クエリ数を記録。</p>
+<pre><code>$posts = Post::with('user')->latest()->take(20)->get();
+foreach ($posts as $post) {
+    echo $post->user->name; // 追加クエリなし
+}
+// デバッグ: DB::listen(...) or Laravel Debugbar
+</code></pre>
+    <p>参考: <a href="https://laravel.com/docs/11.x/eloquent-relationships" target="_blank" rel="noopener noreferrer">Eloquent Relationships</a> / <a href="https://laravel.com/docs/11.x/eloquent" target="_blank" rel="noopener noreferrer">Eloquent ORM</a></p>
+    <div class="ask" data-topic="Laravel EloquentとN+1対策"></div>
+  </details>
+
+  <div id="laravel-test"></div>
+  <details>
+    <summary>Laravelユニットテスト（AAA + 実務ユースケース）</summary>
+    <p>概要: Arrange-Act-Assert でサービスクラスの振る舞いを最小単位で検証する日。</p>
+    <p>なぜ面白いか: 仕様を文章でなくコードとして残せるので、変更時の安心感が段違い。</p>
+    <p>現場での使いどころ: 「割引計算」「権限判定」など、ビジネスロジックが壊れると痛い部分。</p>
+    <p>よくあるハマりどころ: Unit TestなのにDBやHTTPを触ってしまい、遅い・壊れやすいテストになる。</p>
+    <p>今日の実践ミニ課題（You向け）: 料金計算サービスに対して、通常ケース + 境界値（0円/上限）を3ケース追加。</p>
+<pre><code>public function test_fee_is_capped(): void
+{
+    $svc = new FeeCalculator(); // Arrange
+    $fee = $svc->calc(200000);  // Act
+    $this->assertSame(5000, $fee); // Assert
+}
+</code></pre>
+    <p>参考: <a href="https://laravel.com/docs/11.x/testing" target="_blank" rel="noopener noreferrer">Laravel Testing</a> / <a href="https://phpunit.de/documentation.html" target="_blank" rel="noopener noreferrer">PHPUnit</a></p>
+    <div class="ask" data-topic="Laravelユニットテスト AAA"></div>
+  </details>
+
+  <div id="vue"></div>
+  <details>
+    <summary>Vue（Vue2中心）: computed と watch の使い分け</summary>
+    <p>概要: Vue2 では「派生値は computed」「副作用は watch」が基本分担。</p>
+    <p>なぜ面白いか: 再レンダリングの無駄を減らし、読みやすく壊れにくいコンポーネントになる。</p>
+    <p>現場での使いどころ: フィルタ済み一覧表示（computed）と、検索語変更時のAPI再取得（watch）。</p>
+    <p>よくあるハマりどころ: watchで値を加工して state を増やしすぎ、データフローが複雑化する。</p>
+    <p>今日の実践ミニ課題（You向け）: 検索入力で <code>filteredUsers</code> を computed 化し、watchはAPI再取得だけに限定。</p>
+<pre><code>computed: {
+  filteredUsers() {
+    return this.users.filter(u => u.name.includes(this.keyword));
+  }
+},
+watch: {
+  keyword() { this.fetchUsers(); }
+}
+</code></pre>
+    <p>Vue3ならどう書くか: <code>computed()</code> / <code>watch()</code> を Composition API で同じ責務分離にする。</p>
+    <p>参考: <a href="https://v2.vuejs.org/v2/guide/computed.html" target="_blank" rel="noopener noreferrer">Vue2 computed/watch</a> / <a href="https://vuejs.org/guide/essentials/watchers.html" target="_blank" rel="noopener noreferrer">Vue3 Watchers</a></p>
+    <div class="ask" data-topic="Vue2 computedとwatchの使い分け"></div>
+  </details>
+
+  <div id="docker"></div>
+  <details>
+    <summary>Docker: 開発環境の再現性を上げる compose 設計</summary>
+    <p>概要: app/db/redis を docker compose で分離し、ローカル差分を減らす。</p>
+    <p>なぜ面白いか: チーム全員が同じ起動手順になり、「自分の環境だけ動かない」を減らせる。</p>
+    <p>現場での使いどころ: 新規メンバーオンボーディング時、<code>docker compose up -d</code> だけで開始。</p>
+    <p>よくあるハマりどころ: ボリューム永続化の設計不足で、DBが毎回初期化される。</p>
+    <p>今日の実践ミニ課題（You向け）: compose.yml に healthcheck を追加し、app が db ready 後に起動するよう調整。</p>
+    <p>参考: <a href="https://docs.docker.com/compose/" target="_blank" rel="noopener noreferrer">Docker Compose</a> / <a href="https://docs.docker.com/engine/storage/volumes/" target="_blank" rel="noopener noreferrer">Volumes</a></p>
+    <div class="ask" data-topic="Docker compose設計とhealthcheck"></div>
+  </details>
+
+  <div id="aws"></div>
+  <details>
+    <summary>AWS基礎→実務: IAM最小権限（Step 1）</summary>
+    <p>概要: AWS学習の初手は IAM。ユーザー/ロール/ポリシーの関係を整理する。</p>
+    <p>なぜ面白いか: ここを理解すると、EC2やS3など全サービスの権限制御が読めるようになる。</p>
+    <p>現場での使いどころ: CI（GitHub Actions）からS3へデプロイする時、ロールで安全に認可する。</p>
+    <p>よくあるハマりどころ: とりあえずAdministratorAccessを付けてしまい、後で剥がせなくなる。</p>
+    <p>今日の実践ミニ課題（You向け）: S3の特定バケットに <code>GetObject</code> のみ許可するカスタムポリシーを作る。</p>
+    <p>参考: <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html" target="_blank" rel="noopener noreferrer">IAM User Guide</a> / <a href="https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html" target="_blank" rel="noopener noreferrer">Security Pillar</a></p>
+    <div class="ask" data-topic="AWS IAM最小権限の設計"></div>
+  </details>
+
+  <div id="react"></div>
+  <details>
+    <summary>React Day 1: コンポーネントと Props</summary>
+    <p>概要: まずは「UIを部品化してpropsでデータを渡す」基本を固める。</p>
+    <p>なぜ面白いか: 同じUIを再利用でき、変更点を1箇所に閉じ込められる。</p>
+    <p>現場での使いどころ: ボタン、カード、モーダルなど共通UI部品の管理。</p>
+    <p>よくあるハマりどころ: propsを深く渡しすぎて（prop drilling）保守がしんどくなる。</p>
+    <p>復習: JSXは「見た目のテンプレート + JavaScript式」を同時に書く記法。</p>
+    <p>今日の実践ミニ課題（You向け）: UserCard コンポーネントを作り、name/emailをpropsで表示。</p>
+    <p>参考: <a href="https://react.dev/learn/passing-props-to-a-component" target="_blank" rel="noopener noreferrer">Passing Props</a> / <a href="https://react.dev/learn/your-first-component" target="_blank" rel="noopener noreferrer">First Component</a></p>
+    <div class="ask" data-topic="React Day1 コンポーネントとProps"></div>
+  </details>
+
+  <div id="typescript"></div>
+  <details>
+    <summary>TypeScript: union型で入力ゆれを吸収する</summary>
+    <p>概要: <code>string | number</code> のような union で現実的な入力パターンを表現する。</p>
+    <p>なぜ面白いか: 実行前に「あり得る値」を縛れるので、バグの温床を減らせる。</p>
+    <p>現場での使いどころ: APIレスポンスの状態（loading/success/error）管理。</p>
+    <p>よくあるハマりどころ: 型ガードなしでプロパティ参照してコンパイルエラーになる。</p>
+    <p>今日の実践ミニ課題（You向け）: API結果型をdiscriminated unionで表現し、switchで分岐表示。</p>
+    <p>参考: <a href="https://www.typescriptlang.org/docs/handbook/2/narrowing.html" target="_blank" rel="noopener noreferrer">Narrowing</a> / <a href="https://www.typescriptlang.org/docs/handbook/unions-and-intersections.html" target="_blank" rel="noopener noreferrer">Union Types</a></p>
+    <div class="ask" data-topic="TypeScript union型とnarrowing"></div>
+  </details>
+
+  <div id="php-array"></div>
+  <details>
+    <summary>PHP関数 / 配列ヘルパー: map系の比較</summary>
+    <p>概要: 配列変換は素のPHPなら <code>array_map</code>、Laravelなら Collection の <code>map()</code> が定番。</p>
+    <p>なぜ面白いか: 同じ処理でも可読性とチェーン性が大きく変わる。</p>
+    <p>現場での使いどころ: DB結果をAPIレスポンス形式へ整形する前処理。</p>
+    <p>よくあるハマりどころ: PHP配列関数は連鎖しづらく、途中変数が増えて見通しが悪化。</p>
+    <p>素のPHP版 vs Laravel版: <code>array_map(fn($u)=>$u['name'],$users)</code> vs <code>collect($users)->pluck('name')</code>（意図が明確）。</p>
+    <p>今日の実践ミニ課題（You向け）: 既存の <code>array_filter + array_map</code> を Collectionチェーンへ1本置換。</p>
+    <p>参考: <a href="https://www.php.net/manual/en/function.array-map.php" target="_blank" rel="noopener noreferrer">array_map</a> / <a href="https://laravel.com/docs/11.x/collections" target="_blank" rel="noopener noreferrer">Laravel Collections</a></p>
+    <div class="ask" data-topic="PHP配列関数とLaravel Collection比較"></div>
+  </details>
+
+  <div id="lodash"></div>
+  <details>
+    <summary>Lodash: debounce で無駄リクエストを抑える</summary>
+    <p>概要: 入力イベントごとのAPI呼び出しを <code>_.debounce</code> で間引く。</p>
+    <p>なぜ面白いか: UXを損なわずに通信量とサーバー負荷を同時に下げられる。</p>
+    <p>現場での使いどころ: 検索ボックス、オートコンプリート、リアルタイムフィルタ。</p>
+    <p>よくあるハマりどころ: コンポーネント再描画で debounce 関数が再生成され、効かなくなる。</p>
+    <p>今日の実践ミニ課題（You向け）: 300ms debounce を入れて、入力10回時のAPI回数を比較。</p>
+    <p>参考: <a href="https://lodash.com/docs/#debounce" target="_blank" rel="noopener noreferrer">_.debounce</a> / <a href="https://lodash.com/docs/" target="_blank" rel="noopener noreferrer">Lodash Docs</a></p>
+    <div class="ask" data-topic="Lodash debounce活用"></div>
+  </details>
+
+  <div id="html-css"></div>
+  <details>
+    <summary>HTML & CSS: ボックスモデル + display基礎（Step 1）</summary>
+    <p>概要: まずは margin/border/padding/content の関係と <code>display</code> を押さえる。</p>
+    <p>なぜ面白いか: レイアウト崩れの大半はこの理解不足で起きるため、効く範囲が広い。</p>
+    <p>現場での使いどころ: フォームUIの余白統一、カードレイアウトの整列。</p>
+    <p>よくあるハマりどころ: <code>width:100%</code> 要素にpaddingを足して横にはみ出す（box-sizing未設定）。</p>
+    <p>今日の実践ミニ課題（You向け）: 全体に <code>box-sizing: border-box;</code> を適用し、崩れ差分を確認。</p>
+    <p>参考: <a href="https://developer.mozilla.org/ja/docs/Learn/CSS/Building_blocks/The_box_model" target="_blank" rel="noopener noreferrer">Box Model</a> / <a href="https://developer.mozilla.org/ja/docs/Web/CSS/display" target="_blank" rel="noopener noreferrer">display</a></p>
+    <div class="ask" data-topic="HTML/CSS ボックスモデルとdisplay"></div>
+  </details>
+
+  <div id="build-opt"></div>
+  <details>
+    <summary>フロントエンドビルド最適化: dev起動が遅い時の切り分け</summary>
+    <p>概要: webpack/Vite/npm/yarn の遅さは「依存解決・キャッシュ・source map・watch設定」で切り分ける。</p>
+    <p>なぜ面白いか: 体感速度が改善すると、1日単位で開発効率が変わる。</p>
+    <p>現場での使いどころ: 朝イチ起動やブランチ切替後の待ち時間短縮。</p>
+    <p>よくあるハマりどころ: 何となく設定を触って再現性を失い、真因が見えなくなる。</p>
+    <p>計測方法: <code>time npm run dev</code>（or <code>yarn dev</code>）を3回計測し、cold/warm cacheを分けて記録。</p>
+    <p>今日の実践ミニ課題（You向け）: source map を段階的に軽量化（例: eval系）し、初回起動秒数を比較。</p>
+    <p>参考: <a href="https://vite.dev/guide/performance.html" target="_blank" rel="noopener noreferrer">Vite Performance</a> / <a href="https://webpack.js.org/guides/build-performance/" target="_blank" rel="noopener noreferrer">webpack Build Performance</a></p>
+    <div class="ask" data-topic="dev起動が遅い時の切り分け改善"></div>
+  </details>
+
+  <div id="python"></div>
+  <details>
+    <summary>Python実用活用: CSV加工を自動化（Step 1）</summary>
+    <p>概要: 日次レポートCSVを読み込み、必要列だけ抽出して再出力する基本を学ぶ。</p>
+    <p>なぜ面白いか: 手作業のコピペを一瞬で置き換えられ、ミスも減る。</p>
+    <p>現場での使いどころ: 売上CSVやログCSVから、Slack共有用の要約データを作る。</p>
+    <p>よくあるハマりどころ: 文字コード（UTF-8/CP932）と改行コードの違いで読み込み失敗。</p>
+    <p>実務ユースケース: 顧客一覧CSVから「今月更新が必要な顧客」だけを抽出して別CSV化。</p>
+<pre><code>import csv
+with open('input.csv', encoding='utf-8') as f, open('out.csv', 'w', newline='', encoding='utf-8') as g:
+    r = csv.DictReader(f)
+    w = csv.DictWriter(g, fieldnames=['name', 'plan'])
+    w.writeheader()
+    for row in r:
+        if row.get('status') == 'renewal':
+            w.writerow({'name': row['name'], 'plan': row['plan']})
+</code></pre>
+    <p>参考: <a href="https://docs.python.org/3/library/csv.html" target="_blank" rel="noopener noreferrer">csv module</a> / <a href="https://docs.python.org/3/tutorial/inputoutput.html" target="_blank" rel="noopener noreferrer">Python I/O</a></p>
+    <div class="ask" data-topic="Python CSV自動化の実務導入"></div>
+  </details>
+
+  <div id="zapier-n8n"></div>
+  <details>
+    <summary>Zapier + n8n比較（強み・向いている場面 + ユースケース）</summary>
+    <p>比較（強み）: ZapierはSaaS連携の即効性と運用の楽さ、n8nは柔軟性・自己ホスト・複雑分岐に強い。</p>
+    <p>向いている場面: Zapierは「非エンジニア主導の高速自動化」、n8nは「開発者が制御したい社内基盤連携」。</p>
+    <p>ユースケース1: フォーム送信→CRM登録→Slack通知（Zapier向き）。</p>
+    <p>ユースケース2: GitHub Issue→社内DB照合→条件分岐で担当振り分け（n8n向き）。</p>
+    <p>ユースケース3: EC注文→在庫API→会計SaaS連携（両方可、例外処理多いならn8n）。</p>
+    <p>ユースケース4: 毎朝のKPI集計→Discord配信（どちらでも、運用簡単さはZapier）。</p>
+    <p>ユースケース5: Webhook受信→複数システム更新→リトライ制御（n8nが得意）。</p>
+    <p>参考: <a href="https://zapier.com/" target="_blank" rel="noopener noreferrer">Zapier</a> / <a href="https://docs.n8n.io/" target="_blank" rel="noopener noreferrer">n8n Docs</a></p>
+    <div class="ask" data-topic="Zapierとn8nの選定ポイント"></div>
+  </details>
+
+  <div id="openclaw"></div>
+  <details>
+    <summary>OpenClaw: 定期ジョブ運用のコツ</summary>
+    <p>概要: cronタスクは「出力の型（HTML + テキスト）」を固定すると運用が安定する。</p>
+    <p>なぜ面白いか: 1回作ったフローを毎日回し、学習習慣を自動化できる。</p>
+    <p>現場での使いどころ: 毎朝の学習配信、定期ステータス通知、ログ点検。</p>
+    <p>よくあるハマりどころ: ルール増加で出力品質が揺れる（テンプレート化で防ぐ）。</p>
+    <p>今日の実践ミニ課題（You向け）: 次回向けに「React Day番号」「AWS進捗ステップ」を保存するメモ設計を追加。</p>
+    <p>参考: <a href="https://docs.openclaw.ai" target="_blank" rel="noopener noreferrer">OpenClaw Docs</a> / <a href="https://github.com/openclaw/openclaw" target="_blank" rel="noopener noreferrer">OpenClaw GitHub</a></p>
+    <div class="ask" data-topic="OpenClawで定期学習配信を安定運用"></div>
+  </details>
+
+  <section>
+    <h2>今日の深掘り候補</h2>
+    <p><strong>Laravel N+1対策を「検知→改善→再計測」まで1サイクル実施</strong>（Debugbar/クエリログで定量比較）。</p>
+  </section>
+
+  <script>
+    const askTemplate = (topic) => `このトピックで詰まっています。\nトピック: ${topic}\nやりたいこと: \n現状コード/設定: \nエラー/困っている点: \n試したこと: \n次に何を確認すべき？`;
+    document.querySelectorAll('.ask').forEach(el => {
+      const topic = el.dataset.topic || 'このトピック';
+      const template = askTemplate(topic);
+      el.innerHTML = `
+        <div><strong>質問する</strong></div>
+        <div class="ask-links">
+          <a href="https://chat.openai.com/" target="_blank" rel="noopener noreferrer">ChatGPTで質問</a>
+          <a href="https://gemini.google.com/" target="_blank" rel="noopener noreferrer">Geminiで質問</a>
+        </div>
+        <div>質問テンプレ: <code>${template.replace(/\n/g, ' / ')}</code></div>
+        <button class="copy-btn" data-copy="${template.replace(/"/g, '&quot;')}">テンプレをコピー</button>
+      `;
+    });
+
+    document.addEventListener('click', async (e) => {
+      const btn = e.target.closest('.copy-btn');
+      if (!btn) return;
+      try {
+        await navigator.clipboard.writeText(btn.getAttribute('data-copy'));
+      } catch (_) {
+        // no popup/no alert by requirement
+      }
+    });
+  </script>
+</body>
+</html>

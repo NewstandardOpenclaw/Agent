@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Daily Dev Tips - Sample</title>
+  <style>
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans JP",sans-serif;line-height:1.65;max-width:980px;margin:24px auto;padding:0 16px;background:#0b1020;color:#e8ecf3}
+    h1,h2{margin:.2em 0 .6em}
+    a{color:#8ec5ff}
+    .card{background:#141b2d;border:1px solid #26314f;border-radius:12px;padding:18px}
+    .meta{opacity:.8;margin-bottom:12px}
+    details{background:#10172a;border:1px solid #2a3554;border-radius:10px;padding:10px 12px;margin:10px 0}
+    summary{cursor:pointer;font-weight:700}
+    ul{margin:.4em 0 .8em 1.2em}
+    code{background:#0a1224;padding:2px 6px;border-radius:6px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Daily Dev Tips（サンプル）</h1>
+    <div class="meta">日付: 2026-02-24 / 形式: 目次 + トグル開閉</div>
+
+    <h2>目次</h2>
+    <ul>
+      <li><a href="#laravel">Laravel</a></li>
+      <li><a href="#vue">Vue2（+Vue3補足）</a></li>
+      <li><a href="#docker">Docker</a></li>
+      <li><a href="#aws">AWS（開発者向け）</a></li>
+      <li><a href="#react">React Day 1</a></li>
+      <li><a href="#typescript">TypeScript</a></li>
+      <li><a href="#php">PHP関数</a></li>
+      <li><a href="#array">配列ヘルパー</a></li>
+      <li><a href="#lodash">Lodash</a></li>
+      <li><a href="#htmlcss">HTML & CSS</a></li>
+      <li><a href="#zapiern8n">Zapier + n8n比較</a></li>
+      <li><a href="#openclaw">OpenClaw</a></li>
+    </ul>
+
+    <h2 id="laravel">Laravel</h2>
+    <details><summary>FormRequestでバリデーション分離</summary><p>Controllerを薄く保てて保守しやすい。面白さ: 仕様変更時の修正箇所が明確。課題: API1本をFormRequest化。<br>Link: <a href="https://laravel.com/docs/validation">validation</a></p></details>
+
+    <h2 id="vue">Vue2（+Vue3補足）</h2>
+    <details><summary>Vue2ではcomputed優先</summary><p>一覧フィルタはmethodsよりcomputedが適切。面白さ: 再計算の最適化を自動化。課題: methods→computedへ置換。<br>Vue3補足: <code>computed(() =&gt; ...)</code> をsetupで使用。<br>Link: <a href="https://v2.vuejs.org/v2/guide/computed.html">Vue2 computed</a></p></details>
+
+    <h2 id="docker">Docker</h2>
+    <details><summary>レイヤーキャッシュを意識したDockerfile順序</summary><p>依存インストールを上に置いて再ビルド短縮。面白さ: 待ち時間の削減を体感しやすい。課題: 命令順を見直してビルド時間比較。<br>Link: <a href="https://docs.docker.com/build/cache/">build cache</a></p></details>
+
+    <h2 id="aws">AWS（開発者向け）</h2>
+    <details><summary>IAM最小権限から始める</summary><p>まずは権限設計。面白さ: 「動く」だけでなく「安全に動く」を作れる。現場: 開発ロールと本番ロールの分離。課題: 広権限ポリシーを1つ縮小。<br>Link: <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html">IAM best practices</a></p></details>
+
+    <h2 id="react">React Day 1</h2>
+    <details open><summary>コンポーネントの基本</summary><p>UIを部品として関数化して再利用する。面白さ: 画面拡大時ほど保守性の差が出る。課題: Cardコンポーネントを2回再利用。<br>復習: ReactはUIを部品で考える。<br>Link: <a href="https://ja.react.dev/learn/your-first-component">最初のコンポーネント</a></p></details>
+
+    <h2 id="typescript">TypeScript</h2>
+    <details><summary>関数の引数・戻り値から型を付ける</summary><p>any削減の第一歩。面白さ: 実行前にバグを減らせる。課題: util関数3つへ型注釈追加。<br>Link: <a href="https://www.typescriptlang.org/docs/handbook/2/functions.html">functions</a></p></details>
+
+    <h2 id="php">PHP関数</h2>
+    <details><summary>map/filter/reduceの使い分け</summary><p>処理意図を明確化できる。面白さ: foreachの複雑化を防げる。課題: foreach1箇所を置換。<br>Link: <a href="https://www.php.net/manual/en/ref.array.php">array functions</a></p></details>
+
+    <h2 id="array">配列ヘルパー</h2>
+    <details><summary>存在チェック＋デフォルト値をセットで</summary><p>未定義エラーを予防。面白さ: 本番での小さな事故を減らせる。課題: 危険アクセス3箇所を修正。<br>Link: <a href="https://laravel.com/docs/helpers">helpers</a></p></details>
+
+    <h2 id="lodash">Lodash</h2>
+    <details><summary>_.debounceで入力イベント最適化</summary><p>検索API連打を防ぐ。面白さ: UXとAPI負荷を同時改善。課題: 300ms debounce導入。<br>Link: <a href="https://lodash.com/docs/#debounce">debounce</a></p></details>
+
+    <h2 id="htmlcss">HTML & CSS</h2>
+    <details><summary>position: relative/absoluteの基本</summary><p>absoluteは最寄りのpositioned親を基準に配置。面白さ: レイアウト迷子を防げる。ハマりどころ: 親にrelativeが無い。課題: バッジUIを再現。<br>Link: <a href="https://developer.mozilla.org/ja/docs/Web/CSS/position">MDN position</a></p></details>
+
+    <h2 id="zapiern8n">Zapier + n8n比較</h2>
+    <details><summary>速さのZapier / 柔軟性のn8n</summary><p>Zapierは導入速度、n8nは複雑分岐や内製に強い。面白さ: 自動化を運用設計まで含めて考えられる。<br>ユースケース: フォーム→通知→DB登録 / EC注文連携 / 問い合わせ要約振り分け。課題: 同一フローを両方で作って差分比較。<br>Links: <a href="https://zapier.com/learn">Zapier Learn</a> / <a href="https://docs.n8n.io/">n8n docs</a></p></details>
+
+    <h2 id="openclaw">OpenClaw</h2>
+    <details><summary>CronとHeartbeatの使い分け</summary><p>正確時刻はCron、ゆるい巡回はHeartbeat。面白さ: 自動化の精度とコストのバランスが取れる。課題: 既存タスクを分類。<br>Link: <a href="https://docs.openclaw.ai/automation/cron-jobs">cron docs</a></p></details>
+
+    <h2>今日の深掘り候補</h2>
+    <p>「CSSのpositionとz-indexをモーダル/ツールチップで実践検証」</p>
+  </div>
+</body>
+</html>

@@ -3,29 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>東京都の建築設計・リノベ相談 | 山本建築店</title>
-  <meta name="description" content="東京都でリノベ・一軒家・店舗改装の相談を受付中。課題整理から設計、施工前後の伴走まで山本建築店がサポートします。" />
+  <title>東京・渋谷近郊の建築設計・施工相談 | 山本建築店</title>
+  <meta name="description" content="東京・渋谷近郊でリフォーム・外装工事・木造新築の相談を受付中。設計〜施工を一貫してY's KENCHIKUがサポートします。" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="東京都の建築設計・リノベ相談 | 山本建築店" />
-  <meta property="og:description" content="一級建築士在籍。東京都でリノベ・一軒家・店舗改装のご相談を受付中。" />
+  <meta property="og:title" content="東京・渋谷近郊の建築設計・施工相談 | 山本建築店" />
+  <meta property="og:description" content="一級建築士 山本修一。東京・渋谷近郊でリフォーム・外装工事・木造新築のご相談を受付中。" />
   <meta property="og:image" content="https://raw.githubusercontent.com/NewstandardOpenclaw/Kenchiku/main/assets/og-image.svg" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
 
-  <!-- GA4: G-XXXXXXXXXX を実IDに差し替えると計測開始 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MHZPE54BPP"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);} 
     gtag('js', new Date());
-    gtag('config', 'G-XXXXXXXXXX');
+    gtag('config', 'G-MHZPE54BPP');
   </script>
 
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root{
       --bg:#f8fafc; --text:#0f172a; --muted:#475569; --line:#e2e8f0; --brand:#0f766e; --brand2:#0d9488;
     }
     *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
     body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans JP",sans-serif;line-height:1.7}
     .wrap{max-width:980px;margin:0 auto;padding:0 16px}
     header{padding:56px 0 28px;background:linear-gradient(180deg,#ecfeff,#f8fafc)}
@@ -57,11 +59,24 @@
   </style>
 </head>
 <body>
+  <nav class="bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 py-3">
+      <ul class="flex flex-wrap gap-4 text-sm font-semibold text-slate-700">
+        <li><a href="#works">Works</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
   <header>
     <div class="wrap">
-      <p class="sub">一級建築士在籍 / 東京都対応 / リノベ・一軒家・店舗改装</p>
-      <h1>一級建築士の山本建築店が、<br>「何から始めるべきか分からない」を解決します。</h1>
-      <p class="sub">ご要望の整理から、プラン提案、施工前後の調整まで。住まい・店舗づくりを伴走サポートします。</p>
+      <p class="sub">一級建築士 山本修一 / 東京・渋谷近郊対応 / リフォーム・外装工事・木造新築</p>
+      <h1>一級建築士 山本修一（山本建築店）が、<br>「何から始めるべきか分からない」を解決します。</h1>
+      <p class="sub">現地調査・打ち合わせ・見積もり・契約・着工・引き渡しまで、設計施工一貫で伴走します。</p>
+      <div class="card" style="margin-top:12px; border-color:#99f6e4; background:#ecfeff;">
+        <h3 style="font-size:1.15rem; margin:0 0 6px;">📞 お電話でのご相談</h3>
+        <p style="margin:0 0 8px;"><a href="tel:09017694492" style="font-size:1.6rem; font-weight:800; color:#0f766e; text-decoration:none;">090-1769-4492</a></p>
+        <p style="margin:0;"><a class="btn btn-ghost" href="./assets/yamamoto-kenchikuten.vcf" download="yamamoto-kenchikuten.vcf">連絡先に登録する</a></p>
+      </div>
       <div class="btns">
         <a class="btn btn-primary" href="#contact">無料相談（30分）を予約する</a>
         <a class="btn btn-ghost" href="#works">実績を見る</a>
@@ -76,24 +91,34 @@
       <h2>提供できること</h2>
       <div class="grid grid-3">
         <article class="card">
-          <h3>リノベーション</h3>
-          <p>既存建物の魅力を活かしながら、暮らしや業務に合う空間へ再設計します。</p>
+          <h3>リフォーム</h3>
+          <p>住まいの改修を、予算と優先順位に合わせて実現します（平均予算帯: 2,000万円以下）。</p>
         </article>
         <article class="card">
-          <h3>一軒家（新築・改修）</h3>
-          <p>家族構成や将来設計に合わせ、動線・収納・採光まで含めて提案します。</p>
+          <h3>木造新築</h3>
+          <p>木工事を得意分野として、住みやすさと施工性を両立した新築計画をご提案します。</p>
         </article>
         <article class="card">
-          <h3>店舗改装</h3>
-          <p>集客とオペレーションを両立するレイアウトへ、実務目線で改装提案します。</p>
+          <h3>外装工事</h3>
+          <p>外壁・外装の改修で、建物の耐久性と見た目の印象を改善します。</p>
         </article>
       </div>
+    </section>
+
+    <section class="card" data-aos="fade-up">
+      <h2>Y's KENCHIKUの強み</h2>
+      <ul>
+        <li>設計・施工の一貫対応（打ち合わせ〜引き渡しまで）</li>
+        <li>木工事が得意分野で、現場目線の提案が可能</li>
+        <li>誠実なお客様と長く付き合うスタイル</li>
+      </ul>
+      <p class="note">目標: 3ヶ月で案件受注を安定化、1年で顧客を5件程度増加。</p>
     </section>
 
     <section id="works">
       <h2>実績（課題 → 提案 → 結果）</h2>
       <div class="card">
-        <p>実績情報は現在ヒアリング中です。以下フォームで内容を整理し、順次掲載します。</p>
+        <p>実績詳細は現在整理中です。写真素材は用意済みのため、順次公開していきます。</p>
         <p><a class="btn btn-ghost" href="https://docs.google.com/forms/d/e/1FAIpQLSdMDOQv5qdl83FNBzP0y92yDCqQRX48bLqez6150GEGbMLZjA/viewform" target="_blank" rel="noopener noreferrer">実績ヒアリングフォームを開く</a></p>
         <ul>
           <li>課題（依頼前に困っていたこと）</li>
@@ -118,29 +143,73 @@
       <h2>よくある質問</h2>
       <details><summary>相談だけでも可能ですか？</summary><p>可能です。方向性整理のみでも歓迎です。</p></details>
       <details><summary>予算が未確定でも大丈夫ですか？</summary><p>問題ありません。優先順位をつけた段階提案が可能です。</p></details>
-      <details><summary>対応エリアは？</summary><p>〇〇地域中心です。詳細はご相談ください。</p></details>
-      <details><summary>工事会社の紹介はできますか？</summary><p>ご要望に応じて候補をご案内します。</p></details>
+      <details><summary>対応エリアは？</summary><p>東京・渋谷近郊を中心に対応しています。</p></details>
+      <details><summary>店舗工事は対応していますか？</summary><p>現在、店舗工事の新規受付は限定しています。</p></details>
     </section>
 
-    <section id="contact" class="card">
-      <h2>無料相談（30分）</h2>
-      <p>「何から始めればよいか分からない」段階でも大丈夫です。まずは現状と希望をお聞かせください。</p>
-      <div class="btns">
-        <a class="btn btn-primary" href="https://docs.google.com/forms/d/e/1FAIpQLSdMDOQv5qdl83FNBzP0y92yDCqQRX48bLqez6150GEGbMLZjA/viewform" target="_blank" rel="noopener noreferrer">フォームで相談する</a>
-        <a class="btn btn-ghost" href="https://docs.google.com/forms/d/e/1FAIpQLSdMDOQv5qdl83FNBzP0y92yDCqQRX48bLqez6150GEGbMLZjA/viewform" target="_blank" rel="noopener noreferrer">実績ヒアリングに回答する</a>
-      </div>
-      <p class="note">※ LINEビジネスアカウントは準備中。現在はフォーム窓口で受付しています。</p>
-    </section>
 
     <div class="sticky-cta wrap">
       <div class="btns" style="justify-content:flex-end; margin-top:18px;">
         <a class="btn btn-primary" href="#contact">無料相談する</a>
       </div>
     </div>
+
+    <section id="contact" class="py-20 bg-white" data-aos="fade-up">
+      <div class="max-w-7xl mx-auto px-4">
+        <h2 class="text-3xl font-bold tracking-wide mb-4 text-slate-900">CONTACT</h2>
+        <p class="text-slate-600 mb-8 leading-relaxed">お仕事のご依頼やご相談は、以下のフォームよりお気軽にお問い合わせください。通常1〜2営業日以内に返信いたします。受注率は約80%です。</p>
+        <p class="text-slate-700 mb-4"><strong>お急ぎの方はお電話:</strong> <a href="tel:09017694492" class="text-teal-700 font-bold text-xl">090-1769-4492</a> ／ <a href="./assets/yamamoto-kenchikuten.vcf" download="yamamoto-kenchikuten.vcf" class="underline">vCard保存</a></p>
+
+        <div class="max-w-4xl mx-auto rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <form id="contactForm" action="https://docs.google.com/forms/d/e/1FAIpQLSfW5eNbeqaZJ32j1vV1CBdhu4oUnxT_-pJD-iYzB5J-850miw/formResponse" method="POST" target="hidden_iframe" class="space-y-4">
+            <div>
+              <label class="block text-sm font-semibold text-slate-800 mb-1" for="name">お名前</label>
+              <input id="name" name="entry.1153024075" type="text" required class="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:ring-2 focus:ring-teal-600" placeholder="山田 太郎" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-slate-800 mb-1" for="email">メールアドレス</label>
+              <input id="email" name="entry.4101489" type="email" required class="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:ring-2 focus:ring-teal-600" placeholder="example@mail.com" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-slate-800 mb-1" for="phone">電話番号</label>
+              <input id="phone" name="entry.654988412" type="tel" required class="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:ring-2 focus:ring-teal-600" placeholder="090-1234-5678" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-slate-800 mb-1" for="message">お問い合わせ内容</label>
+              <textarea id="message" name="entry.239063851" required rows="6" class="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:ring-2 focus:ring-teal-600" placeholder="ご希望内容・ご予算感・時期などをご記入ください"></textarea>
+            </div>
+
+            <input type="hidden" name="fvv" value="1" />
+            <input type="hidden" name="pageHistory" value="0" />
+
+            <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-teal-700 px-5 py-2.5 text-white font-semibold hover:bg-teal-800 transition">送信する</button>
+            <p id="contactSuccess" class="hidden text-sm text-emerald-700 font-medium">送信ありがとうございました。内容を確認し、1〜2営業日以内にご連絡します。</p>
+            <p class="text-xs text-slate-500">送信情報はGoogleフォームに保存されます。</p>
+          </form>
+          <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer class="wrap">
-    <p>© 建築士オフィス（仮）</p>
+    <p>© 山本建築店 / 一級建築士 山本修一</p>
   </footer>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    if (window.AOS) AOS.init({ once: true, duration: 700 });
+
+    const form = document.getElementById('contactForm');
+    const success = document.getElementById('contactSuccess');
+    if (form && success) {
+      form.addEventListener('submit', function() {
+        setTimeout(() => {
+          success.classList.remove('hidden');
+          form.reset();
+        }, 700);
+      });
+    }
+  </script>
 </body>
 </html>
