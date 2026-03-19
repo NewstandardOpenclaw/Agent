@@ -1,0 +1,11 @@
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+*.pem
+*.key
+.env
+**/client_secret.json
+**/google_forms_token.json
+tmp-gform/
+node_modules/
