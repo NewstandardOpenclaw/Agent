@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AWS DVA Daily Input - Event Source Mapping & Lambda Layered Config</title>
+  <style>
+    :root { --bg:#0b1020; --card:#141b34; --text:#eef3ff; --muted:#9fb0d9; --accent:#7aa2ff; --ok:#32d296; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:linear-gradient(160deg,#0b1020,#121a35); color:var(--text); }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 28px 16px 60px; }
+    h1 { margin: 0 0 8px; font-size: 1.7rem; }
+    .sub { color: var(--muted); margin-bottom: 20px; }
+    .topic { background: rgba(20,27,52,.92); border:1px solid #27345f; border-radius: 14px; padding: 18px; margin-bottom: 18px; }
+    h2 { margin-top: 0; font-size: 1.2rem; color: #cfe0ff; }
+    .grid { display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+    .box { background:#0f1730; border:1px solid #24335f; border-radius:10px; padding:10px 12px; }
+    .box h3 { margin:.1rem 0 .35rem; font-size: .95rem; color:#b7cbff; }
+    .box p, .box li { color:#e7eeff; line-height:1.5; margin:.2rem 0; font-size: .95rem; }
+    .full { grid-column: 1 / -1; }
+    .actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    button { border:1px solid #35529b; color:#e9f0ff; background:#1b2a53; border-radius:8px; padding:8px 10px; cursor:pointer; }
+    button:hover { background:#22366b; }
+    .mini { color:var(--muted); font-size:.86rem; margin-top: 8px; }
+    #toast { position:fixed; bottom:16px; right:16px; background:#14294f; border:1px solid #3f66bd; color:#e8f0ff; padding:10px 12px; border-radius:10px; display:none; }
+    @media (max-width: 820px){ .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>AWS DVA インプット特化デイリー（2026-03-20）</h1>
+    <p class="sub">テーマ限定: AWS Certified Developer - Associate 対策。今日は「イベント駆動の信頼性設計」と「設定/シークレット管理」を短時間で固める。</p>
+
+    <section class="topic" id="topic1">
+      <h2>Topic 1: Lambda × SQS イベントソースマッピング（可視化しにくい再試行の本体）</h2>
+      <div class="grid">
+        <div class="box"><h3>定義</h3><p>Event Source Mapping(ESM) は、SQS キューからメッセージをポーリングし、Lambda へバッチで渡す中継設定。Lambda 側コードだけでなく、ESM 側のバッチサイズ・最大同時実行数・失敗時挙動で実運用の安定性が決まる。</p></div>
+        <div class="box"><h3>重要性</h3><p>DVA では「なぜ重複処理が起きるか」「どこで再試行されるか」の問われ方が多い。SQS 標準キューは少なくとも1回配送で重複があり得るため、アプリ側冪等性を必須で設計する。</p></div>
+        <div class="box"><h3>使い分け</h3><ul><li><b>Partial batch response</b>: 一部失敗のみ再試行したいとき</li><li><b>DLQ</b>: 何度も失敗する毒メッセージ隔離</li><li><b>FIFO + message group</b>: 厳密順序が必要なとき</li></ul></div>
+        <div class="box"><h3>誤解</h3><p>「Lambda が失敗したら全件ロールバックされる」は誤解。バッチ処理では設定次第で成功分まで再配信される。部分失敗レスポンスを返さないと再処理コストが増える。</p></div>
+        <div class="box full"><h3>3分要点</h3><p>① SQS→Lambda は ESM がポーリング実行。② 重複配送前提で <b>idempotency key</b> を持つ。③ Partial batch response を使わないと成功分まで巻き込まれやすい。④ 可観測性は CloudWatch Logs + ApproximateAgeOfOldestMessage で遅延把握。</p></div>
+      </div>
+      <div class="actions">
+        <button onclick="copyText(topic1Text)">📋 トピック内容をコピー</button>
+        <button onclick="copyText(topic1Links)">🔗 参照リンクをコピー</button>
+        <button onclick="copyText(topic1Support)">🧪 実践課題のサポートを依頼（文面コピー）</button>
+      </div>
+      <p class="mini">導線3点: 内容コピー / リンクコピー / サポート依頼コピー</p>
+    </section>
+
+    <section class="topic" id="topic2">
+      <h2>Topic 2: Parameter Store vs Secrets Manager（設定と秘密情報の境界設計）</h2>
+      <div class="grid">
+        <div class="box"><h3>定義</h3><p>AWS Systems Manager Parameter Store は構成値管理、AWS Secrets Manager は秘密情報（DB認証情報/APIキー等）管理に最適化されたサービス。どちらもKMS暗号化可。</p></div>
+        <div class="box"><h3>重要性</h3><p>DVA では「資格情報をコードに埋めない」「ローテーション要件があるなら何を選ぶか」が頻出。設計判断を問う実務寄り問題が多い。</p></div>
+        <div class="box"><h3>使い分け</h3><ul><li><b>Parameter Store</b>: 単純構成値、コスト重視、階層キー管理</li><li><b>Secrets Manager</b>: 自動ローテーション、監査、RDS連携</li><li><b>Lambda</b>: 初期化時キャッシュ + TTLでAPIコール削減</li></ul></div>
+        <div class="box"><h3>誤解</h3><p>「SecureString なら Secrets Manager 不要」は半分正解。暗号化だけなら可能だが、自動ローテーション運用まで含めるなら Secrets Manager が本命。</p></div>
+        <div class="box full"><h3>3分要点</h3><p>① 値の性質で分ける（設定値か秘密か）。② ローテーション要件の有無が分岐点。③ IAM最小権限は `ssm:GetParameter` と `secretsmanager:GetSecretValue` を資源ARNで限定。④ Lambdaでは毎invoke取得せずキャッシュ戦略を併用。</p></div>
+      </div>
+      <div class="actions">
+        <button onclick="copyText(topic2Text)">📋 トピック内容をコピー</button>
+        <button onclick="copyText(topic2Links)">🔗 参照リンクをコピー</button>
+        <button onclick="copyText(topic2Support)">🧪 実践課題のサポートを依頼（文面コピー）</button>
+      </div>
+      <p class="mini">導線3点: 内容コピー / リンクコピー / サポート依頼コピー</p>
+    </section>
+
+  </div>
+
+  <div id="toast">コピーしました</div>
+  <script>
+    const topic1Text = `Topic1: Lambda × SQS ESM\n- 定義: ESMがSQSをポーリングしLambdaへバッチ配送\n- 重要性: 重複配送前提で冪等設計必須\n- 使い分け: Partial batch response / DLQ / FIFO\n- 誤解: 失敗時に成功分まで再試行され得る\n- 3分要点: idempotency, partial failure, CloudWatch監視`;
+    const topic1Links = `AWS Lambda with SQS: https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html\nUsing partial batch response: https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#events-sqs-batchfailurereporting`;
+    const topic1Support = `DVA演習サポート依頼:\nSQS→Lambdaのバッチ失敗を想定した実装レビューをお願いします。\n条件: 重複配送対応(idempotency key), partial batch response, DLQ設定の妥当性を確認したいです。`;
+
+    const topic2Text = `Topic2: Parameter Store vs Secrets Manager\n- 定義: 設定値管理と秘密情報管理の責務分離\n- 重要性: 資格情報管理とローテーション要件が試験頻出\n- 使い分け: コスト重視=Parameter Store, 自動ローテ=Secrets Manager\n- 誤解: SecureStringだけで運用要件を満たすとは限らない\n- 3分要点: 値の性質・ローテ要件・最小権限・キャッシュ戦略`;
+    const topic2Links = `Parameter Store docs: https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html\nSecrets Manager docs: https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html`;
+    const topic2Support = `DVA演習サポート依頼:\nLambdaアプリの設定/シークレット管理設計をレビューしてください。\n要件: 本番は自動ローテ必須、開発環境はコスト重視、IAMは最小権限で定義したいです。`;
+
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        toast();
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast();
+      }
+    }
+    function toast(){ const el = document.getElementById('toast'); el.style.display='block'; setTimeout(()=>el.style.display='none',1200); }
+  </script>
+</body>
+</html>
