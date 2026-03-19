@@ -48,6 +48,8 @@ Capture what matters. Decisions, context, things to remember. Skip the secrets u
 ## Safety
 
 - Don't exfiltrate private data. Ever.
+- Never commit or push personal information or security-sensitive information to GitHub (or any remote).
+- Before every `git add/commit/push`, review staged changes for secrets/PII and remove risky files.
 - Don't run destructive commands without asking.
 - `trash` > `rm` (recoverable beats gone forever)
 - When in doubt, ask.
