@@ -55,6 +55,12 @@ variable "root_volume_size" {
   default     = 30
 }
 
+variable "attach_instance_profile" {
+  description = "Create/attach IAM instance profile to EC2"
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   description = "Extra tags"
   type        = map(string)

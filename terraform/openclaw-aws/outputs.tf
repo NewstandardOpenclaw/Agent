@@ -15,5 +15,5 @@ output "security_group_id" {
 }
 
 output "iam_instance_profile" {
-  value = aws_iam_instance_profile.openclaw.name
+  value = var.attach_instance_profile ? aws_iam_instance_profile.openclaw[0].name : null
 }

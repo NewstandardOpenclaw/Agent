@@ -33,6 +33,7 @@ resource "aws_security_group" "openclaw" {
 }
 
 resource "aws_iam_role" "openclaw" {
+  count = var.attach_instance_profile ? 1 : 0
   name = "${var.name_prefix}-ec2-role"
 
   assume_role_policy = jsonencode({
@@ -50,8 +51,9 @@ resource "aws_iam_role" "openclaw" {
 }
 
 resource "aws_iam_instance_profile" "openclaw" {
+  count = var.attach_instance_profile ? 1 : 0
   name = "${var.name_prefix}-ec2-profile"
-  role = aws_iam_role.openclaw.name
+  role = aws_iam_role.openclaw[0].name
 
   tags = local.common_tags
 }
@@ -62,7 +64,7 @@ resource "aws_instance" "openclaw" {
   subnet_id                   = var.subnet_id
   vpc_security_group_ids      = [aws_security_group.openclaw.id]
   key_name                    = var.key_name
-  iam_instance_profile        = aws_iam_instance_profile.openclaw.name
+  iam_instance_profile        = var.attach_instance_profile ? aws_iam_instance_profile.openclaw[0].name : null
   associate_public_ip_address = !var.associate_eip
 
   root_block_device {
