@@ -1,0 +1,3 @@
+order_id,customer_id,name,email,amount,order_date
+1001,C001,Taro,taro@example.com,12000.0,2026-03-01
+1002,C002,Hanako,hanako@example.com,8500.0,2026-03-02
