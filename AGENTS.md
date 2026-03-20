@@ -131,6 +131,7 @@ Skills provide your tools. When you need one, check its `SKILL.md`. Keep local n
 
 - **Discord/WhatsApp:** No markdown tables! Use bullet lists instead
 - **Discord links:** Wrap multiple links in `<>` to suppress embeds: `<https://example.com>`
+- **Discord code indentation rule (this user):** when posting code in Discord, represent indentation with visible `・・` markers per level to avoid rendering collapse.
 - **WhatsApp:** No headers — use **bold** or CAPS for emphasis
 
 ## 💓 Heartbeats - Be Proactive!
