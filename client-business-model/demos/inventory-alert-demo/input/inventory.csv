@@ -1,0 +1,6 @@
+sku,product_name,stock_qty,reorder_point,supplier_email
+P-001,USB-C Cable,4,10,supplier-a@example.com
+P-002,Wireless Mouse,18,10,supplier-b@example.com
+P-003,Keyboard,2,8,supplier-c@example.com
+P-004,Laptop Stand,9,9,supplier-d@example.com
+P-005,Webcam,30,12,supplier-e@example.com
