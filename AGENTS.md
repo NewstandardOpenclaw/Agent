@@ -38,6 +38,12 @@ Capture what matters. Decisions, context, things to remember. Skip the secrets u
 
 ### 📝 Write It Down - No "Mental Notes"!
 
+### 🚫 Change Control Rule
+
+- Do not change existing files, rules, wording, structure, or settings on your own initiative.
+- Always ask and get explicit user approval before making non-trivial edits.
+- If a change is requested, implement only the requested scope; do not add extra modifications.
+
 - **Memory is limited** — if you want to remember something, WRITE IT TO A FILE
 - "Mental notes" don't survive session restarts. Files do.
 - When someone says "remember this" → update `memory/YYYY-MM-DD.md` or relevant file
