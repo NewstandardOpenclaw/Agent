@@ -1,0 +1,13 @@
+{
+  "profile": {
+    "displayName": "Your Name",
+    "bio": "Automation / Web / Cloud",
+    "avatar": "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=300",
+    "theme": "midnight"
+  },
+  "links": [
+    { "title": "GitHub", "url": "https://github.com/", "subtitle": "Works & code", "enabled": true },
+    { "title": "Portfolio", "url": "https://example.com", "subtitle": "Case studies", "enabled": true },
+    { "title": "Contact", "url": "mailto:hello@example.com", "subtitle": "DM me", "enabled": true }
+  ]
+}

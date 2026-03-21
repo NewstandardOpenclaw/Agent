@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LinkNest Admin</title>
+  <style>
+    body { margin:0; font-family:Inter,system-ui,sans-serif; background:#0b1020; color:#e8ecff; }
+    .wrap { max-width:760px; margin:0 auto; padding:20px; }
+    .card { background:#121a33; border:1px solid #22315f; border-radius:14px; padding:14px; margin-bottom:12px; }
+    input, textarea { width:100%; background:#0e1630; color:#e8ecff; border:1px solid #2b3f7f; border-radius:8px; padding:8px; margin-top:6px; }
+    .row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    button { background:#24376f; color:#fff; border:1px solid #3a57ad; border-radius:8px; padding:8px 12px; cursor:pointer; margin-right:8px; }
+    .muted { color:#9ba8cf; font-size:12px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>LinkNest Admin</h1>
+    <p class="muted">ローカル保存MVP。Saveすると index.html に反映されます（同一ブラウザ）。</p>
+
+    <div class="card">
+      <h3>Profile</h3>
+      <label>表示名 <input id="displayName"></label>
+      <label>Bio <textarea id="bio" rows="3"></textarea></label>
+      <label>Avatar URL <input id="avatar"></label>
+    </div>
+
+    <div class="card">
+      <h3>Links(JSON)</h3>
+      <p class="muted">形式: [{"title":"GitHub","url":"https://...","subtitle":"...","enabled":true}]</p>
+      <textarea id="links" rows="10"></textarea>
+    </div>
+
+    <button id="save">Save</button>
+    <button id="export">Export JSON</button>
+    <input id="importFile" type="file" accept="application/json" />
+  </div>
+
+  <script>
+    const sample = {
+      profile: { displayName: 'Your Name', bio: 'Automation / Web / Cloud', avatar: 'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=300' },
+      links: [{ title: 'GitHub', url: 'https://github.com', subtitle: 'Works & code', enabled: true }]
+    };
+
+    function loadData() {
+      const data = JSON.parse(localStorage.getItem('linknest:data') || 'null') || sample;
+      displayName.value = data.profile.displayName || '';
+      bio.value = data.profile.bio || '';
+      avatar.value = data.profile.avatar || '';
+      links.value = JSON.stringify(data.links || [], null, 2);
+    }
+
+    save.onclick = () => {
+      const data = {
+        profile: { displayName: displayName.value, bio: bio.value, avatar: avatar.value },
+        links: JSON.parse(links.value)
+      };
+      localStorage.setItem('linknest:data', JSON.stringify(data));
+      alert('Saved! index.html を開いて確認してください。');
+    };
+
+    export.onclick = () => {
+      const data = localStorage.getItem('linknest:data') || JSON.stringify(sample);
+      const blob = new Blob([data], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'linknest-data.json';
+      a.click();
+    };
+
+    importFile.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const txt = await file.text();
+      JSON.parse(txt); // validate
+      localStorage.setItem('linknest:data', txt);
+      loadData();
+      alert('Imported!');
+    };
+
+    loadData();
+  </script>
+</body>
+</html>

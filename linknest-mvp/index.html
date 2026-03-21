@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LinkNest</title>
+  <style>
+    :root { --bg:#0b1020; --card:#121a33; --text:#e8ecff; --muted:#98a3c7; --accent:#7c9bff; }
+    body { margin:0; font-family:Inter,system-ui,-apple-system,sans-serif; background:linear-gradient(180deg,#0a0f1d,#0b1020); color:var(--text); }
+    .wrap { max-width:460px; margin:0 auto; padding:24px 16px 60px; }
+    .profile { text-align:center; margin-top:20px; }
+    .avatar { width:96px; height:96px; border-radius:50%; object-fit:cover; border:3px solid #2b3b73; }
+    .name { margin:12px 0 6px; font-size:24px; font-weight:700; }
+    .bio { color:var(--muted); margin:0 0 20px; }
+    .links { display:grid; gap:10px; }
+    .link { display:block; background:var(--card); border:1px solid #22315f; border-radius:14px; padding:14px; color:var(--text); text-decoration:none; }
+    .title { font-weight:700; }
+    .sub { color:var(--muted); font-size:13px; margin-top:4px; }
+    .foot { text-align:center; color:var(--muted); margin-top:20px; font-size:12px; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; color:var(--muted); font-size:12px; }
+    button { background:#1d2b57; border:1px solid #2e448c; color:#dfe6ff; border-radius:8px; padding:6px 10px; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <span>LinkNest MVP</span>
+      <button id="loadSample">Sample</button>
+    </div>
+    <section class="profile">
+      <img id="avatar" class="avatar" alt="avatar" />
+      <h1 id="name" class="name"></h1>
+      <p id="bio" class="bio"></p>
+    </section>
+    <section id="links" class="links"></section>
+    <p class="foot">Powered by LinkNest</p>
+  </div>
+
+  <script>
+    const fallback = {
+      profile: { displayName: "Your Name", bio: "Automation / Web / Cloud", avatar: "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=300" },
+      links: []
+    };
+
+    async function loadSample() {
+      const r = await fetch('./data.sample.json');
+      return await r.json();
+    }
+
+    function render(data) {
+      document.getElementById('avatar').src = data.profile.avatar || fallback.profile.avatar;
+      document.getElementById('name').textContent = data.profile.displayName || fallback.profile.displayName;
+      document.getElementById('bio').textContent = data.profile.bio || fallback.profile.bio;
+
+      const root = document.getElementById('links');
+      root.innerHTML = '';
+      (data.links || []).filter(x => x.enabled !== false).forEach(link => {
+        const a = document.createElement('a');
+        a.className = 'link';
+        a.href = link.url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.innerHTML = `<div class="title">${link.title}</div><div class="sub">${link.subtitle || ''}</div>`;
+        root.appendChild(a);
+      });
+    }
+
+    async function init() {
+      let data;
+      try {
+        data = JSON.parse(localStorage.getItem('linknest:data') || 'null');
+        if (!data) data = await loadSample();
+      } catch {
+        data = await loadSample();
+      }
+      render(data);
+    }
+
+    document.getElementById('loadSample').onclick = async () => {
+      const data = await loadSample();
+      localStorage.setItem('linknest:data', JSON.stringify(data));
+      render(data);
+    };
+
+    init();
+  </script>
+</body>
+</html>
